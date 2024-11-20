@@ -1,6 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
+
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 
 import { 
     Card,
@@ -33,9 +38,11 @@ import {
 } from "../ui/dropdown-menu"
 
 import { Dialog, DialogContent, DialogTrigger } from '../ui/dialog';
+import { MagnifyingGlass } from 'react-loader-spinner'
 
 import { ArrowUpDownIcon } from 'lucide-react';
 import { Separator } from '../ui/separator'
+
 import { useDispatch, useSelector } from 'react-redux'
 
 import { 
@@ -63,38 +70,54 @@ import SpecificInstrument from '../search-response/SpecificInstrument'
 import CombinedData from '../search-response/CombinedData'
 
 
+
 const SearchBar = React.forwardRef((props, ref) =>  {
   const dispatch = useDispatch()
   const { toast } = useToast();
-  const handleSearch = async (currSymbol) => {
-    if(currSymbol === "") {
+  const handleSearch = async (currSymbol, getStartDate, getEndDate) => {
+    if(currSymbol === "" || getStartDate === "" || getEndDate === "") {
       toast({
           variant: "destructive",
           title: "Uh Oh! Something Went Wrong.",
-          description: "Symbol Cannot be Empty :(",
+          description: "Symbol Cannot be Empty & Dates are Mandatory :(",
           action: <ToastAction altText="Try again">Try again</ToastAction>
       })
 
       return;
     }
 
+    const currentDate = dayjs();
+    const start = dayjs(getStartDate);
+    const end = dayjs(getEndDate);
+
+    if (start.isAfter(currentDate) || end.isAfter(currentDate)) {
+      toast({
+        variant: "destructive",
+        title: "Uh Oh! Something Went Wrong.",
+        description: "Start Date & End Date Cannot Be After Current Date :(",
+        action: <ToastAction altText="Try again">Try again</ToastAction>
+      })
+
+      return
+    } 
+
     try {
       if (database === 'PostgreSQL') {
         await dispatch(searchStockDataPostgreSql(currSymbol)).unwrap();
         await dispatch(searchTradeInfoPostgreSql(currSymbol)).unwrap();
         await dispatch(searchInstrumentPostgreSql(currSymbol)).unwrap();
-        await dispatch(searchCombinedPostgreSql(currSymbol)).unwrap();
+        await dispatch(searchCombinedPostgreSql({getStartDate, getEndDate})).unwrap();
       } else {
         await dispatch(searchStockDataClickHouse(currSymbol)).unwrap();
         await dispatch(searchTradeInfoClickHouse(currSymbol)).unwrap();
         await dispatch(searchInstrumentClickHouse(currSymbol)).unwrap();
-        await dispatch(searchCombinedClickHouse(currSymbol)).unwrap();
+        await dispatch(searchCombinedClickHouse({getStartDate, getEndDate})).unwrap();
       }
     } catch (error) {
         toast({
         variant: "destructive",
         title: "Uh Oh! Something Went Wrong.",
-        description: "Error Fetching Data From PostgreSQL :(",
+        description: "Error Fetching Data From Database :(",
         action: <ToastAction altText="Try again">Try again</ToastAction>
       })
     }
@@ -102,6 +125,8 @@ const SearchBar = React.forwardRef((props, ref) =>  {
 
   const [database, setDatabase] = useState('PostgreSQL');
   const [symbol, setSymbol] = useState("")
+  const [startDate, setStartDate] = useState(dayjs(Date.now()).format('YYYY-MM-DD'));
+  const [endDate, setEndDate] = useState(dayjs(Date.now()).format('YYYY-MM-DD'));
 
 
   const stockSearchResponse = useSelector((state) => state.search.searchStockData)
@@ -114,6 +139,8 @@ const SearchBar = React.forwardRef((props, ref) =>  {
   const tradeSearchPerformance = useSelector((state) => state.search.searchTradePerformance)
   const instrumentSearchPerformance = useSelector((state) => state.search.searchInstrumentPerformance)
   const combinedSearchPerformance = useSelector((state) => state.search.searchCombinedPerformance)
+
+  const loading = useSelector((state) => state.search.isLoading)
   
 
   console.log(stockSearchResponse, "Stock Search Response");
@@ -125,7 +152,12 @@ const SearchBar = React.forwardRef((props, ref) =>  {
   console.log(combinedSearchResponse, "Combined Search Response");
   console.log(combinedSearchPerformance, "Combined Search Performance");
   
-  
+  console.log(startDate, "Start Date")
+  console.log(endDate, "End Date")
+
+  useEffect(() => {
+    dispatch(resetSearchResults());
+  },[])
 
   return (
     <div ref={ref} className='md:px-6 px-4 py-8 bg-gray-900 w-full'>
@@ -133,7 +165,7 @@ const SearchBar = React.forwardRef((props, ref) =>  {
               <DropdownMenu className='rounded-lg px-4'> 
                 <DropdownMenuTrigger asChild>
                   <Button 
-                     className="flex items-center gap-1 rounded-xl border border-gray-800 text-white bg-gray-700 px-4 py-2 ml-2 hover:bg-gray-500"
+                     className="flex items-center gap-1 h-14 rounded-xl border border-gray-800 text-white bg-gray-700 px-4 py-2 ml-2 hover:bg-gray-500"
                   >   
                   <span>Current DB : {database}</span>
                   <ArrowUpDownIcon className="h-4 w-4" />
@@ -148,6 +180,28 @@ const SearchBar = React.forwardRef((props, ref) =>  {
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
              </DropdownMenu>
+             <div className="flex items-center gap-3">
+                <div className="text-white font-semibold">Start Date</div>
+
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <MobileDatePicker
+                        defaultValue={dayjs(Date.now())}
+                        className="bg-gray-300 rounded-xl px-4 py-2"
+                        onChange={(date) => setStartDate(date.format('YYYY-MM-DD'))}
+                      />
+                </LocalizationProvider>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="text-white font-semibold">End Date</div>
+
+                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <MobileDatePicker
+                        defaultValue={dayjs(Date.now())}
+                        className="bg-gray-300 rounded-xl px-4 py-2"
+                        onChange={(date) => setEndDate(date.format('YYYY-MM-DD'))}
+                      />
+                </LocalizationProvider>
+              </div>
         </div>
         <div className='flex justify-center mb-8'>
            <div className='w-full flex items-center mt-2'>
@@ -161,13 +215,31 @@ const SearchBar = React.forwardRef((props, ref) =>  {
 
               <Button 
                 className='bg-green-600 hover:bg-green-800 text-white h-full rounded-r-2xl'
-                onClick={() => handleSearch(symbol)}>
+                onClick={() => handleSearch(symbol,startDate,endDate)}>
                 Search
               </Button>
            </div>
         </div>
+        {
+          loading 
+          ? 
+          <div className="mt-3 flex justify-center items-center">
+             <MagnifyingGlass
+                visible={true}
+                height="80"
+                width="80"
+                ariaLabel="magnifying-glass-loading"
+                wrapperStyle={{}}
+                wrapperClass="magnifying-glass-wrapper"
+                glassColor="#c0efff"
+                color="#e15b64"
+              />
+          </div>  
+          : 
+          null
+        }
         { 
-          stockSearchResponse && stockSearchPerformance && tradeSearchResponse && tradeSearchResponse.length > 0 && tradeSearchPerformance && instrumentSearchResponse && instrumentSearchPerformance && combinedSearchResponse && combinedSearchResponse.length > 0 && combinedSearchPerformance 
+          stockSearchResponse && stockSearchPerformance && tradeSearchResponse && tradeSearchResponse.length > 0 && tradeSearchPerformance && instrumentSearchResponse && instrumentSearchPerformance && combinedSearchResponse && combinedSearchPerformance 
           ? 
             <div>
                 <div className="mt-4 flex justify-center items-center gap-4">
@@ -231,8 +303,8 @@ const SearchBar = React.forwardRef((props, ref) =>  {
                         </TableRow>
                         <TableRow>
                             <TableCell className='text-center bg-gray-800 text-white'>Combined Data Search</TableCell>
-                            <TableCell className='text-center bg-gray-600 text-white'>{combinedSearchPerformance.readSpeed}</TableCell>
-                            <TableCell className='text-center bg-gray-800 text-white'>{combinedSearchPerformance.throughput}</TableCell>
+                            <TableCell className='text-center bg-gray-600 text-white'>{combinedSearchPerformance?.readSpeed}</TableCell>
+                            <TableCell className='text-center bg-gray-800 text-white'>{combinedSearchPerformance?.throughput}</TableCell>
                             <TableCell className='text-center bg-gray-600 text-white'>
                                   <Dialog>
                                       <DialogTrigger asChild>
@@ -262,7 +334,11 @@ const SearchBar = React.forwardRef((props, ref) =>  {
             </div>
           :
             <div className='flex justify-center items-center'>
-                <p className='text-2xl font-bold text-red-600'>No Results To Display</p>
+                <p className='text-2xl font-bold text-red-600'>
+                  {
+                    loading ? "Loading Data ..." : "No Data Found"
+                  }
+                </p>
             </div>
         }
     </div>

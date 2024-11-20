@@ -24,6 +24,7 @@ import {
 } from "../ui/dropdown-menu"
 
 import { Dialog, DialogTrigger } from '../ui/dialog';
+import { MagnifyingGlass } from 'react-loader-spinner';
 
 import Pagination from './../../helper/pagination/Pagination.jsx';
 import { ArrowUpDownIcon } from 'lucide-react';
@@ -50,6 +51,7 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
 
   const searchData = useSelector((state) => state.dataFetch.dataList);
   const searchPerformanceMetrics = useSelector((state) => state.dataFetch.performanceMetrics);
+  const loading = useSelector((state) => state.dataFetch.isLoading);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -123,7 +125,27 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
           </div>
         </div>
 
-        {database === 'None' ? null :
+        {
+          loading 
+          ? 
+          <div className="mt-3 flex justify-center items-center">
+            <MagnifyingGlass
+                visible={true}
+                height="80"
+                width="80"
+                ariaLabel="magnifying-glass-loading"
+                wrapperStyle={{}}
+                wrapperClass="magnifying-glass-wrapper"
+                glassColor="#c0efff"
+                color="#e15b64"
+              />
+          </div>  
+          : 
+          null
+        }
+
+        {database !== 'None' && searchData && searchData.length > 0 
+          ? 
           <div className='overflow-x-auto mt-2'>
               <Table>
                 <TableHeader>
@@ -185,6 +207,12 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
                 onPageChange={page => setCurrentPage(page)}
               />
         </div>
+        :
+          <div className='text-red-400 font-semibold flex items-center justify-center mt-5'>
+              {
+                loading ? "Loading Data ..." : "No Data To Display"
+              }
+          </div>
         }
       </div>
     </>

@@ -61,9 +61,9 @@ export const searchInstrumentPostgreSql = createAsyncThunk('/search/searchInstru
 )
 
 export const searchCombinedPostgreSql = createAsyncThunk('/search/searchCombinedPostgreSql', 
-    async (symbol, { rejectWithValue }) => {
+    async ({getStartDate, getEndDate}, { rejectWithValue }) => {
       try {
-        const result = await axios.get(`https://trading-dashboard-backend.onrender.com/combined/${symbol}?dbsource=postgres`);
+        const result = await axios.get(`https://trading-dashboard-backend.onrender.com/aggregate?dbsource=postgres&startDate=${getStartDate}&endDate=${getEndDate}`);
         return result?.data
       } catch (error) {
         if (error.response && error.response.data) {
@@ -123,9 +123,9 @@ export const searchInstrumentClickHouse = createAsyncThunk('/search/searchInstru
 )
 
 export const searchCombinedClickHouse = createAsyncThunk('/search/searchCombinedClickHouse', 
-    async (symbol, { rejectWithValue }) => {
+    async ({getStartDate, getEndDate}, { rejectWithValue }) => {
       try {
-        const result = await axios.get(`https://trading-dashboard-backend.onrender.com/combined/${symbol}?dbsource=clickhouse`);
+        const result = await axios.get(`https://trading-dashboard-backend.onrender.com/aggregate?dbsource=clickhouse&startDate=${getStartDate}&endDate=${getEndDate}`);
         return result?.data
       } catch (error) {
         if (error.response && error.response.data) {
