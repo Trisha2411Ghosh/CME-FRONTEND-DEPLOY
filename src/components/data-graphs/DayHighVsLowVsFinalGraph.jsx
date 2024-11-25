@@ -33,7 +33,7 @@ function DayHighVsLowVsFinalGraph({dayHigh, dayLow, dayFinal}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Graph 2</CardTitle>
+        <CardTitle className='font-medium'>Graph of Day_High vs Day_Low vs Day_Final</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -67,15 +67,6 @@ function DayHighVsLowVsFinalGraph({dayHigh, dayLow, dayFinal}) {
           </AreaChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter>
-        <div className="flex w-full items-start gap-2 text-sm">
-          <div className="grid gap-2">
-            <div className="flex items-center gap-2 font-medium leading-none">
-              Day_High vs Day_Low vs Day_Final
-            </div>
-          </div>
-        </div>
-      </CardFooter>
     </Card>
   )
 }

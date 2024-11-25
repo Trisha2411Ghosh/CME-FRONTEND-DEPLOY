@@ -10,7 +10,9 @@ const initialState = {
     searchInstrument: null,
     searchInstrumentPerformance: null,
     searchCombined: [],
-    searchCombinedPerformance: null
+    searchCombinedPerformance: null,
+    searchIndustry:[],
+    searchIndustryPerformance: null
 }
 
 // For PostgreSQL
@@ -64,6 +66,21 @@ export const searchCombinedPostgreSql = createAsyncThunk('/search/searchCombined
     async ({getStartDate, getEndDate}, { rejectWithValue }) => {
       try {
         const result = await axios.get(`https://trading-dashboard-backend.onrender.com/aggregate?dbsource=postgres&startDate=${getStartDate}&endDate=${getEndDate}`);
+        return result?.data
+      } catch (error) {
+        if (error.response && error.response.data) {
+            return rejectWithValue(error.response.data);
+        } else {
+            return rejectWithValue({ message: 'Something went wrong!' });
+        }
+      }
+    }
+)
+
+export const searchIndustryPostgreSql = createAsyncThunk('/search/searchIndustryPostgreSql', 
+    async ({getStartDate, getEndDate}, { rejectWithValue }) => {
+      try {
+        const result = await axios.get(`https://trading-dashboard-backend.onrender.com/industry?dbsource=postgres&startDate=${getStartDate}&endDate=${getEndDate}`);
         return result?.data
       } catch (error) {
         if (error.response && error.response.data) {
@@ -137,6 +154,21 @@ export const searchCombinedClickHouse = createAsyncThunk('/search/searchCombined
     }
 )
 
+export const searchIndustryClickHouse = createAsyncThunk('/search/searchIndustryClickHouse', 
+    async ({getStartDate, getEndDate}, { rejectWithValue }) => {
+      try {
+        const result = await axios.get(`https://trading-dashboard-backend.onrender.com/industry?dbsource=clickhouse&startDate=${getStartDate}&endDate=${getEndDate}`);
+        return result?.data
+      } catch (error) {
+        if (error.response && error.response.data) {
+            return rejectWithValue(error.response.data);
+        } else {
+            return rejectWithValue({ message: 'Something went wrong!' });
+        }
+      }
+    }
+)
+
 const searchSlice = createSlice({
     name: 'searchBySymbol',
     initialState,
@@ -149,7 +181,9 @@ const searchSlice = createSlice({
             state.searchInstrument = null,
             state.searchInstrumentPerformance = null,
             state.searchCombined = [],
-            state.searchCombinedPerformance = null
+            state.searchCombinedPerformance = null,
+            state.searchIndustry = [],
+            state.searchIndustryPerformance = null
         }
     },
     extraReducers: (builder) => {
@@ -206,6 +240,19 @@ const searchSlice = createSlice({
             state.searchCombined = []
             state.searchCombinedPerformance = null
         })
+        .addCase(searchIndustryPostgreSql.pending, (state) => {
+            state.isLoading = true
+        })
+        .addCase(searchIndustryPostgreSql.fulfilled, (state, action) => {
+            state.isLoading = false
+            state.searchIndustry = action.payload.data
+            state.searchIndustryPerformance = action.payload.performanceMetrics
+        })
+        .addCase(searchIndustryPostgreSql.rejected, (state) => {
+            state.isLoading = false
+            state.searchIndustry = []
+            state.searchIndustryPerformance = null
+        })
 
         .addCase(searchStockDataClickHouse.pending, (state) => {
             state.isLoading = true
@@ -258,6 +305,19 @@ const searchSlice = createSlice({
             state.isLoading = false
             state.searchCombined = []
             state.searchCombinedPerformance = null
+        })
+        .addCase(searchIndustryClickHouse.pending, (state) => {
+            state.isLoading = true
+        })
+        .addCase(searchIndustryClickHouse.fulfilled, (state, action) => {
+            state.isLoading = false
+            state.searchIndustry = action.payload.data
+            state.searchIndustryPerformance = action.payload.performanceMetrics
+        })
+        .addCase(searchIndustryClickHouse.rejected, (state) => {
+            state.isLoading = false
+            state.searchIndustry = []
+            state.searchIndustryPerformance = null
         })
     }
 })

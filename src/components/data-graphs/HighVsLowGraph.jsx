@@ -36,7 +36,7 @@ function HighVsLowGraph({high, low}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Graph 1</CardTitle>
+        <CardTitle>Graph of Week_52_High vs Week_52_Low</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -58,11 +58,6 @@ function HighVsLowGraph({high, low}) {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Week_52_High vs Week_52_Low
-        </div>
-      </CardFooter>
     </Card>
   )
 }

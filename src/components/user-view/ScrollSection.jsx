@@ -10,7 +10,7 @@ function ScrollSection() {
           <>
             <h1 className="text-4xl font-semibold text-black dark:text-white">
               Unleash the power of <br />
-              <span className="text-4xl md:text-[6rem] font-bold mt-1 leading-none">
+              <span className="text-2xl md:text-[4rem] font-bold mt-1 leading-none">
               Real-Time Trading Insights <br/>
               </span>
             </h1>

@@ -35,7 +35,7 @@ function PrevVsFinalGraph({prevClose, finalValue}) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Graph 3</CardTitle>
+        <CardTitle>Graph of Prev_Close vs Final_Value</CardTitle>
       </CardHeader>
       <CardContent>
         <ChartContainer config={chartConfig}>
@@ -57,11 +57,6 @@ function PrevVsFinalGraph({prevClose, finalValue}) {
           </BarChart>
         </ChartContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="flex gap-2 font-medium leading-none">
-          Prev_Close vs Final_Value
-        </div>
-      </CardFooter>
     </Card>
   )
 }

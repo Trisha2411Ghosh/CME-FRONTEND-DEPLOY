@@ -43,7 +43,12 @@ export const fetchDataFromClickHouse = createAsyncThunk('/data/fetchDataFromClic
 const dataFetchSlice = createSlice({
     name: 'fetchData',
     initialState,
-    reducers: {},
+    reducers: {
+        resetDataFetchResult: (state) => {
+           state.dataList = []
+           state.performanceMetrics = {}
+        } 
+    },
     extraReducers: (builder) => {
         builder
         .addCase(fetchDataFromPostgreSQL.pending, (state) => {
@@ -74,3 +79,4 @@ const dataFetchSlice = createSlice({
 })
 
 export default dataFetchSlice.reducer;
+export const { resetDataFetchResult } = dataFetchSlice.actions;

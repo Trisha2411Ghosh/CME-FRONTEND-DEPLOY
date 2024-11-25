@@ -32,19 +32,29 @@ import TradeDetailsDialog from './TradeDetailsDialog';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { fetchDataFromClickHouse, fetchDataFromPostgreSQL } from '../../store/dataFetchSlice/index.js';
+import { resetDataFetchResult } from '../../store/dataFetchSlice/index.js';
 
 
 const DisplayTradeData = React.forwardRef((props, ref) => {
   const dispatch = useDispatch();
 
   const [database, setDatabase] = useState('None');
+  const [prevPostgreTime, setPrevPostgreTime] = useState(null);
+  const [prevClickHouseTime, setPrevClickHouseTime] = useState(null);
 
   useEffect(() => {
     if (database === 'PostgreSQL') {
+      dispatch(resetDataFetchResult());
       dispatch(fetchDataFromPostgreSQL());
     }
     else if(database === 'ClickHouse'){
+      dispatch(resetDataFetchResult());
       dispatch(fetchDataFromClickHouse());
+    }
+    else if(database === 'None'){
+      dispatch(resetDataFetchResult());
+      setPrevPostgreTime(null);
+      setPrevClickHouseTime(null);
     }
   }, [database, dispatch])
 
@@ -52,6 +62,14 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
   const searchData = useSelector((state) => state.dataFetch.dataList);
   const searchPerformanceMetrics = useSelector((state) => state.dataFetch.performanceMetrics);
   const loading = useSelector((state) => state.dataFetch.isLoading);
+
+  useEffect(() => {
+    if (database === 'ClickHouse' && searchPerformanceMetrics && searchPerformanceMetrics.readSpeed) {
+      setPrevClickHouseTime(searchPerformanceMetrics.readSpeed);
+    } else if (database === 'PostgreSQL' && searchPerformanceMetrics && searchPerformanceMetrics.readSpeed) {
+      setPrevPostgreTime(searchPerformanceMetrics.readSpeed);
+    }
+  }, [searchPerformanceMetrics, database]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -67,62 +85,84 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
       <div ref={ref} className="py-2 bg-gray-950">
         <div className='mb-2'>
           <div className="text-center">
-            <p className="m-3 mb-5 text-3xl leading-8 font-extrabold tracking-tight text-teal-500 sm:text-4xl capitalize">Mockup Trade Data</p>
+            <p className="m-3 mb-5 text-3xl leading-8 font-extrabold tracking-tight text-teal-500 sm:text-4xl capitalize">Real-Time Trade Data</p>
           </div>
 
-          <div className='flex justify-start items-center mb-2 px-4 gap-3'>
-              <DropdownMenu className='rounded-lg px-4'> 
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                     className="flex items-center gap-1 rounded-xl border border-gray-800 text-white bg-gray-700 px-4 py-2 ml-2 hover:bg-gray-500"
-                  >   
-                  <span>Current DB : {database}</span>
+          <div className="flex flex-wrap justify-between items-center mb-2 px-4 gap-3">
+            <DropdownMenu className="rounded-lg px-4 flex-1"> 
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  className="flex items-center gap-1 rounded-xl border border-gray-800 text-white bg-gray-700 px-4 py-2 hover:bg-gray-500 w-full"
+                >   
+                  <span>Current DB: {database}</span>
                   <ArrowUpDownIcon className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-gray-900 text-gray-300">
-                    <DropdownMenuLabel className='font-semibold text-base'>Select Database</DropdownMenuLabel>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56 bg-gray-900 text-gray-300">
+                <DropdownMenuLabel className="font-semibold text-base">Select Database</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuRadioGroup value={database} onValueChange={setDatabase}>
+                  <DropdownMenuRadioItem value="None" className="cursor-pointer">None</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="PostgreSQL" className="cursor-pointer">PostgreSQL</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="ClickHouse" className="cursor-pointer">ClickHouse</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {database === 'None' ? (
+              <div className="text-blue-300 font-semibold flex-1 text-center">
+                Select Any Database To View Data & Performance Metrics
+              </div>
+            ) : (
+              <>
+                <DropdownMenu className="rounded-lg px-4 flex-1"> 
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      className="flex items-center gap-1 rounded-xl border border-gray-800 text-white bg-gray-700 px-4 py-2 hover:bg-gray-500 w-full"
+                    >   
+                      <span>Current Rows Per Page: {pageSize}</span>
+                      <ArrowUpDownIcon className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56 bg-gray-900 text-gray-300">
+                    <DropdownMenuLabel className="font-semibold text-base">Select Rows Per Page</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup value={database} onValueChange={setDatabase}>
-                      <DropdownMenuRadioItem value="None" className='cursor-pointer'>None</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="PostgreSQL" className='cursor-pointer'>PostgreSQL</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="ClickHouse" className='cursor-pointer'>ClickHouse</DropdownMenuRadioItem>
+                    <DropdownMenuRadioGroup value={pageSize} onValueChange={setPageSize}>
+                      <DropdownMenuRadioItem value={10} className="cursor-pointer">10</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value={50} className="cursor-pointer">50</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value={100} className="cursor-pointer">100</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value={200} className="cursor-pointer">200</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value={500} className="cursor-pointer">500</DropdownMenuRadioItem>
+                      <DropdownMenuRadioItem value={searchData.length} className="cursor-pointer">All</DropdownMenuRadioItem>
                     </DropdownMenuRadioGroup>
                   </DropdownMenuContent>
-             </DropdownMenu>
-            
-            {
-              database === 'None' ? <div className='text-red-600 font-semibold'>Select Any Database To View Data & Performance Metrics</div> 
-              : 
-              <div className='flex gap-3'>
-                  <DropdownMenu className='rounded-lg px-4'> 
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          className="flex items-center gap-1 rounded-xl border border-gray-800 text-white bg-gray-700 px-4 py-2 ml-2 hover:bg-gray-500"
-                        >   
-                        <span>Current Rows Per Page : {pageSize}</span>
-                        <ArrowUpDownIcon className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent className="w-56 bg-gray-900 text-gray-300">
-                          <DropdownMenuLabel className='font-semibold text-base'>Select Rows Per Page</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuRadioGroup value={pageSize} onValueChange={setPageSize}>
-                            <DropdownMenuRadioItem value={10} className='cursor-pointer'>10</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value={50} className='cursor-pointer'>50</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value={100} className='cursor-pointer'>100</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value={200} className='cursor-pointer'>200</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value={500} className='cursor-pointer'>500</DropdownMenuRadioItem>
-                            <DropdownMenuRadioItem value={searchData.length} className='cursor-pointer'>All</DropdownMenuRadioItem>
-                          </DropdownMenuRadioGroup>
-                        </DropdownMenuContent>
-                  </DropdownMenu>
-                  
-                  <div className='outline outline-gray-500 py-2 px-3 rounded-xl font-semibold'>Read Speed: {searchPerformanceMetrics.readSpeed}</div>
-                  <div className='outline outline-gray-500 py-2 px-3 rounded-xl font-semibold'>Throughput: {searchPerformanceMetrics.throughput} </div>
-              </div>
-            }
+                </DropdownMenu>
+
+                <div className="outline outline-gray-500 py-2 px-3 rounded-xl font-semibold text-center flex-1">
+                  Read Speed: {searchPerformanceMetrics.readSpeed}
+                </div>
+
+                <div className="outline outline-gray-500 py-2 px-3 rounded-xl font-semibold text-center flex-1">
+                  Throughput: {searchPerformanceMetrics.throughput}
+                </div>
+              </>
+            )}
           </div>
+        {
+          database !== 'None' ?
+            <div className="flex justify-center mt-3 mb-3">
+              <div className="outline outline-gray-600 inline-block py-2 px-3 rounded-xl font-semibold">
+                {
+                database === 'ClickHouse'
+                  ? `Previous PostgreSQL Read Speed: ${prevPostgreTime}`
+                  : `Previous ClickHouse Read Speed: ${prevClickHouseTime}`
+                }
+              </div>
+            </div>
+          :
+           null
+        }
+            
         </div>
 
         {
@@ -208,7 +248,7 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
               />
         </div>
         :
-          <div className='text-red-400 font-semibold flex items-center justify-center mt-5'>
+          <div className='text-blue-100 font-semibold flex items-center justify-center mt-5'>
               {
                 loading ? "Loading Data ..." : "No Data To Display"
               }

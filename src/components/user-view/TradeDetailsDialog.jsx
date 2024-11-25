@@ -46,7 +46,7 @@ function TradeDetailsDialog({tradeDataDetails}) {
       </div>
       <DialogFooter className="sm:justify-start">
         <DialogClose asChild>
-          <Button type="button" variant="secondary" className="rounded-xl bg-red-600 hover:bg-red-950">
+          <Button type="button" variant="secondary" className="rounded-xl bg-blue-800 hover:bg-blue-950">
             Close
           </Button>
         </DialogClose>
