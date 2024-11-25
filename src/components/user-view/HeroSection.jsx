@@ -19,7 +19,7 @@ function HeroSection() {
           text: "using",
         },
         {
-          text: "TradingDasboard",
+          text: "TradingDashboard",
           className: "text-blue-500 dark:text-blue-500",
         },
     ];
@@ -42,7 +42,7 @@ function HeroSection() {
                     borderRadius="1.75rem"
                     className="bg-white dark:bg-black text-black dark:text-white border-neutral-200 dark:border-slate-800 "
                     >
-                    Go to Dasboard
+                    Go to Dashboard
                     </Button>
                 </Link>
             </div>
