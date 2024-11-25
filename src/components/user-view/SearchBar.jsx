@@ -350,13 +350,13 @@ const SearchBar = React.forwardRef((props, ref) =>  {
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell className='text-center bg-gray-800 text-white'>Combined Data Search</TableCell>
+                            <TableCell className='text-center bg-gray-800 text-white'>Trade Aggregate Search</TableCell>
                             <TableCell className='text-center bg-gray-600 text-white'>{combinedSearchPerformance?.readSpeed}</TableCell>
                             <TableCell className='text-center bg-gray-800 text-white'>{combinedSearchPerformance?.throughput}</TableCell>
                             <TableCell className='text-center bg-gray-600 text-white'>
                                   <Dialog>
                                       <DialogTrigger asChild>
-                                          <Button variant="outline" className='rounded-full bg-black hover:bg-gray-800 text-white'>View Combined Search Response</Button>
+                                          <Button variant="outline" className='rounded-full bg-black hover:bg-gray-800 text-white'>View Trade Aggregate Search Response</Button>
                                       </DialogTrigger>
                                       
                                       <CombinedData combinedData={combinedSearchResponse} />
