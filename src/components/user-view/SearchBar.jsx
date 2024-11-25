@@ -282,15 +282,15 @@ const SearchBar = React.forwardRef((props, ref) =>  {
                   <div className="outline outline-gray-600 inline-block py-2 px-3 rounded-xl font-semibold">
                     {
                       database === 'ClickHouse'
-                        ? `Previous PostgreSQL Combined Search Read Speed: ${prevPostgreCombinedTime}`
-                        : `Previous ClickHouse Combined Search Read Speed: ${prevClickHouseCombinedTime}`
+                        ? `Previous PostgreSQL Trade Aggregate Search Read Speed: ${prevPostgreCombinedTime}`
+                        : `Previous ClickHouse Trade Aggregate Search Read Speed: ${prevClickHouseCombinedTime}`
                     }
                   </div>
                   <div className="outline outline-gray-600 inline-block py-2 px-3 rounded-xl font-semibold">
                     {
                       database === 'ClickHouse'
-                        ? `Previous PostgreSQL Industry Search Read Speed: ${prevPostgreIndustryTime}`
-                        : `Previous ClickHouse Industry Search Read Speed: ${prevClickHouseIndustryTime}`
+                        ? `Previous PostgreSQL Industry Aggregate Search Read Speed: ${prevPostgreIndustryTime}`
+                        : `Previous ClickHouse Industry Aggregate Search Read Speed: ${prevClickHouseIndustryTime}`
                     }
                   </div>
                 </div>
