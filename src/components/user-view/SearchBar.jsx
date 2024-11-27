@@ -228,48 +228,6 @@ const SearchBar = React.forwardRef((props, ref) => {
 
   return (
     <div ref={ref} className="md:px-6 px-4 py-8 bg-gray-900 w-full">
-      {/* <div className='flex justify-start items-center mb-2 gap-3'>
-              <DropdownMenu className='rounded-lg px-4'> 
-                <DropdownMenuTrigger asChild>
-                  <Button 
-                     className="flex items-center gap-1 h-14 rounded-xl border border-gray-800 text-white bg-gray-700 px-4 py-2 ml-2 hover:bg-gray-500"
-                  >   
-                  <span>Current DB : {database}</span>
-                  <ArrowUpDownIcon className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56 bg-gray-900 text-gray-300">
-                    <DropdownMenuLabel className='font-semibold text-base'>Select Database</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuRadioGroup value={database} onValueChange={setDatabase}>
-                      <DropdownMenuRadioItem value="PostgreSQL" className='cursor-pointer'>PostgreSQL</DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="ClickHouse" className='cursor-pointer'>ClickHouse</DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuContent>
-             </DropdownMenu>
-             <div className="flex items-center gap-3">
-                <div className="text-white font-semibold">Start Date</div>
-
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <MobileDatePicker
-                        defaultValue={dayjs(Date.now())}
-                        className="bg-gray-300 rounded-xl px-4 py-2"
-                        onChange={(date) => setStartDate(date.format('YYYY-MM-DD'))}
-                      />
-                </LocalizationProvider>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="text-white font-semibold">End Date</div>
-
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <MobileDatePicker
-                        defaultValue={dayjs(Date.now())}
-                        className="bg-gray-300 rounded-xl px-4 py-2"
-                        onChange={(date) => setEndDate(date.format('YYYY-MM-DD'))}
-                      />
-                </LocalizationProvider>
-              </div>
-        </div> */}
       <div className="flex flex-col sm:flex-row justify-start items-center mb-2 gap-3">
         <DropdownMenu className="rounded-lg px-4">
           <DropdownMenuTrigger asChild>
