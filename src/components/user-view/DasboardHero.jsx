@@ -12,7 +12,7 @@ function DasboardHero({onButtonOneClick, onButtonTwoClick}) {
 
       <Boxes />
       
-      <h1 className={cn("h-[96px] text-4xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 z-20 mb-6")}>
+      <h1 className={cn("h-[96px] text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 z-20 mb-6 text-center")}>
         Welcome to TradingDashboard
       </h1>
       
