@@ -57,11 +57,12 @@ const dataFetchSlice = createSlice({
         .addCase(fetchDataFromPostgreSQL.fulfilled, (state, action) => {
             state.isLoading = false
             state.dataList = action.payload.data
-            state.performanceMetrics = action.payload.performanceMetrics
+            state.performanceMetrics = action.payload.overallPerformanceMetrics
         })
         .addCase(fetchDataFromPostgreSQL.rejected, (state) => {
             state.isLoading = false
             state.dataList = []
+            state.performanceMetrics = {}
         })
         .addCase(fetchDataFromClickHouse.pending, (state) => {
             state.isLoading = true
@@ -69,11 +70,12 @@ const dataFetchSlice = createSlice({
         .addCase(fetchDataFromClickHouse.fulfilled, (state, action) => {
             state.isLoading = false
             state.dataList = action.payload.data
-            state.performanceMetrics = action.payload.performanceMetrics
+            state.performanceMetrics = action.payload.overallPerformanceMetrics
         })
         .addCase(fetchDataFromClickHouse.rejected, (state) => {
             state.isLoading = false
             state.dataList = []
+            state.performanceMetrics = {}
         })
     }
 })

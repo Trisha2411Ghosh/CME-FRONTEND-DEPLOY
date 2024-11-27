@@ -109,7 +109,8 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
               </DropdownMenuContent>
             </DropdownMenu>
 
-            {database === 'None' ? (
+            {
+             database === 'None' ? (
               <div className="text-blue-300 font-semibold flex-1 text-center">
                 Select Any Database To View Data & Performance Metrics
               </div>
@@ -153,16 +154,15 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
             <div className="flex justify-center mt-3 mb-3">
               <div className="outline outline-gray-600 inline-block py-2 px-3 rounded-xl font-semibold">
                 {
-                database === 'ClickHouse'
-                  ? `Previous PostgreSQL Read Speed: ${prevPostgreTime}`
-                  : `Previous ClickHouse Read Speed: ${prevClickHouseTime}`
+                  database === 'ClickHouse'
+                    ? `Previous PostgreSQL Read Speed: ${prevPostgreTime}`
+                    : `Previous ClickHouse Read Speed: ${prevClickHouseTime}`
                 }
               </div>
             </div>
           :
            null
-        }
-            
+        }    
         </div>
 
         {
@@ -204,33 +204,37 @@ const DisplayTradeData = React.forwardRef((props, ref) => {
                     <TableHead className='bg-gray-600'>Final Price</TableHead>
                     <TableHead className='bg-gray-800'>Day High</TableHead>
                     <TableHead className='bg-gray-600'>Day Low</TableHead>
+                    <TableHead className='bg-gray-800'>Read Speed</TableHead>
+                    <TableHead className='bg-gray-600'>Throughput</TableHead>
                     <TableHead className='bg-gray-800'>Graph Section</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {currentTableData.map((data) => (
                     <TableRow key={data?.symbol}>
-                      <TableCell className='bg-gray-800'>{data?.symbol}</TableCell>
-                      <TableCell className='bg-gray-600'>{data?.prevClose}</TableCell>
-                      <TableCell className='bg-gray-800'>{data?.iep}</TableCell>
-                      <TableCell className='bg-gray-600'>{data?.chng}</TableCell>
-                      <TableCell className='bg-gray-800'>{data?.pctChng}</TableCell>
-                      <TableCell className='bg-gray-600'>{data?.finalValue}</TableCell>
-                      <TableCell className='bg-gray-800'>{data?.finalQuantity}</TableCell>
-                      <TableCell className='bg-gray-600'>{data?.value}</TableCell>
-                      <TableCell className='bg-gray-800'>{data?.ffmCap}</TableCell>
-                      <TableCell className='bg-gray-600'>{data?.week52High}</TableCell>
-                      <TableCell className='bg-gray-800'>{data?.week52Low}</TableCell>
-                      <TableCell className='bg-gray-600'>{data?.finalPrice}</TableCell>
-                      <TableCell className='bg-gray-800'>{data?.dayHigh}</TableCell>
-                      <TableCell className='bg-gray-600'>{data?.dayLow}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.info?.symbol}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.info?.prevClose}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.info?.iep}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.info?.chng}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.info?.pctChng}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.info?.finalValue}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.info?.finalQuantity}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.info?.value}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.info?.ffmCap}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.info?.week52High}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.info?.week52Low}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.info?.finalPrice}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.info?.dayHigh}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.info?.dayLow}</TableCell>
+                      <TableCell className='bg-gray-800'>{data?.rowMetrics?.readSpeed}</TableCell>
+                      <TableCell className='bg-gray-600'>{data?.rowMetrics?.throughput}</TableCell>
                       <TableCell className='bg-gray-800'>
                             <Dialog>
                                 <DialogTrigger asChild>
                                     <Button variant="outline" className='rounded-full bg-black/[0.96] hover:bg-gray-900 text-white'>View Graph</Button>
                                 </DialogTrigger>
 
-                                <TradeDetailsDialog tradeDataDetails={data}/>
+                                <TradeDetailsDialog tradeDataDetails={data?.info}/>
 
                             </Dialog>
                       </TableCell>
